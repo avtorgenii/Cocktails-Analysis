@@ -1,1 +1,1 @@
-# Cocktail DB analysis
+# Cocktails analysis
