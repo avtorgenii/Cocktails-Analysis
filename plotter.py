@@ -94,6 +94,24 @@ class Plotter:
         # Show the plot
         plt.show()
 
+    def plot_cocktails_with_largest_amount_of_ingredients(self, n_cocktails):
+        # Top N cocktails with largest amount of ingredients
+        top_n = 30
+        hardest_cocktails = self.cocktails.sort_values(ascending=False, by='num_ingredients').head(top_n)
+
+        # Create a bar plot using seaborn
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x=hardest_cocktails['num_ingredients'], y=hardest_cocktails['name'], palette='coolwarm',
+                    hue=hardest_cocktails['name'])
+
+        # Add labels and title
+        plt.ylabel('Cocktails')
+        plt.xlabel('Num of ingredients')
+        plt.title(f'Top {top_n} cocktails by ingredients number')
+
+        # Show the plot
+        plt.show()
+
     def plot_cocktails_rank_by_abv(self, n_cocktails, strongest=True):
         # Cocktails ABV rank
         cocktails = self.cocktails.sort_values(ascending=not strongest, by='abv').head(n_cocktails)
@@ -228,7 +246,10 @@ class Plotter:
         # Add labels and title
         plt.xlabel('Volume Oz')
         plt.ylabel('Ingredient')
-        plt.title(f'Top {n_ingredients} Ingredients by Mean Used Volume')
+        if alcoholic:
+            plt.title(f'Top {n_ingredients} Alcoholic Ingredients by Mean Used Volume')
+        else:
+            plt.title(f'Top {n_ingredients} Ingredients by Mean Used Volume')
 
         # Show the plot
         plt.show()
