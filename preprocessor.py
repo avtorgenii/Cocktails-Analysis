@@ -134,8 +134,12 @@ def _preprocess_cocktails_table(cocktails, ingredients, cocktails_and_ingredient
 
     # Cocktails preparation method
     cocktails['prep_method'] = cocktails['instructions'].str.extract(r'(?i)\b(Stir|Blend|Shake)\b')
-    cocktails['prep_method'] = cocktails['prep_method'].str.capitalize()
+
+    cocktails.loc[cocktails['prep_method'].isna(), 'prep_method'] = cocktails['instructions'].str.extract(
+        r'(?i)\b(Pour)\b', expand=False)
+
     cocktails['prep_method'] = cocktails['prep_method'].fillna('Unknown')
+    cocktails['prep_method'] = cocktails['prep_method'].str.capitalize()
 
 
 def _preprocess_ingredients_table(ingredients):
