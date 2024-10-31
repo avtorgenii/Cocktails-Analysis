@@ -3,6 +3,12 @@ import re
 
 
 def _create_ingredients_table(cocktails):
+    """
+    Extracts data about all ingredients into separate dataframe
+    :param cocktails: Dataframe made from raw json
+    :return: Ingredients table
+    """
+
     ingredients = pd.DataFrame(columns=['ingredient'])
 
     for index, row in cocktails.iterrows():
@@ -23,6 +29,11 @@ def _create_ingredients_table(cocktails):
 
 
 def _create_cocktails_and_ingredients_table(cocktails):
+    """
+    Extracts data about ingredients used to make every cocktail into separate dataframe
+    :param cocktails: Raw dataframe of cocktails made from json
+    :return: Cocktails and Ingredients table
+    """
     cocktails_and_ingredients = pd.DataFrame(
         columns=['cocktail_id', 'cocktail_name', 'ingredient_id', 'ingredient_name', 'measure'])
 
@@ -46,21 +57,37 @@ def _create_cocktails_and_ingredients_table(cocktails):
                                                         'measure': [measure]})],
                                                   ignore_index=True)
 
-    cocktails.drop(columns=['ingredients'], inplace=True)
-
     return cocktails_and_ingredients
 
 
 def _clean_cocktails_table(cocktails):
-    cocktails.drop(columns=['id', 'imageUrl', 'alcoholic', 'createdAt', 'updatedAt'],
+    """
+    Drops 'id', 'imageUrl', 'alcoholic', 'createdAt', 'updatedAt', 'ingredients' columns from cocktails dataframe
+    :param cocktails: Cocktails dataframe from raw json
+    :return:
+    """
+    cocktails.drop(columns=['id', 'imageUrl', 'alcoholic', 'createdAt', 'updatedAt', 'ingredients'],
                    inplace=True)  # Not needed for analysis
 
 
 def _clean_ingredients_table(ingredients):
+    """
+    Drops imageUrl column from ingredients dataframe
+    :param ingredients: Ingredients dataframe
+    :return:
+    """
     ingredients.drop(columns=['imageUrl'], inplace=True)
 
 
 def _preprocess_cocktails_table(cocktails, ingredients, cocktails_and_ingredients):
+    """
+    Calculates ABV for each cocktail, categorizes cocktails by ABV, extracts info about number of ingredients,
+    length of instruction and preparation method
+    :param cocktails:
+    :param ingredients:
+    :param cocktails_and_ingredients:
+    :return:
+    """
     result_df = cocktails_and_ingredients.set_index('ingredient_id').join(
         ingredients[['percentage', 'generalized_type']], how='left')
 
@@ -143,6 +170,11 @@ def _preprocess_cocktails_table(cocktails, ingredients, cocktails_and_ingredient
 
 
 def _preprocess_ingredients_table(ingredients):
+    """
+    Fixes a bunch of types of ingredients, adds generalized_type column, fills percentage data for some of alcoholic ingredients
+    :param ingredients:
+    :return:
+    """
     ingredients.loc[ingredients['type'] == 'Liquer', 'type'] = 'Liqueur'
     ingredients.loc[ingredients['type'] == 'Bitters', 'type'] = 'Bitter'
     ingredients.loc[ingredients['type'] == 'Beverage', 'type'] = 'Brandy'
@@ -213,6 +245,11 @@ def _preprocess_ingredients_table(ingredients):
 
 
 def _preprocess_cocktails_and_ingredients_table(cocktails_and_ingredients):
+    """
+    Parses measures of ingredients in cocktails and converts to oz
+    :param cocktails_and_ingredients:
+    :return:
+    """
     # Measures parsing
     def parse_oz_measure(measure):
         # Regex pattern to capture ranges like '2-3 oz' and fractions like '1/2 oz'
@@ -329,6 +366,11 @@ def _preprocess_cocktails_and_ingredients_table(cocktails_and_ingredients):
 
 
 def preprocess():
+    """
+    Downloads cocktails.json from SolVro github and performs all needed preprocessing and augmentation of data for
+    analysis, for details see docs of functions inside
+    :return: cocktails, ingredients, cocktails_and_ingredients dataframes
+    """
     # Read json
     init_table = pd.read_json(
         "https://raw.githubusercontent.com/Solvro/rekrutacja/refs/heads/main/data/cocktail_dataset.json")

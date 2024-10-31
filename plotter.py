@@ -4,6 +4,10 @@ import pandas as pd
 
 
 class Plotter:
+    """
+    A class to generate various plots related to cocktails, ingredients, and their properties.
+    """
+
     def __init__(self, cocktails, ingredients, cocktails_and_ingredients):
         self.cocktails = cocktails
         self.ingredients = ingredients
@@ -11,62 +15,56 @@ class Plotter:
 
     # Cocktails
     def plot_cocktail_categories(self):
-        # Cocktails Categories
+        """
+        Plots a pie chart of cocktail categories with the distribution of each category.
+        """
         top_categories = self.cocktails['category'].value_counts()
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(12, 6))
 
-        # Pie Chart
         wedges, texts, autotexts = plt.pie(top_categories, labels=top_categories.index, autopct='%1.1f%%',
                                            startangle=180, colors=sns.color_palette('coolwarm', len(top_categories)))
 
-        # Add labels and title
         plt.title('Cocktails Categories')
 
-        # Create custom labels for the legend that include category and number of cocktails
         legend_labels = [f'{count} cocktails' for count in top_categories]
 
-        # Add the legend
         plt.legend(wedges, legend_labels, title="Number of Cocktails", loc="upper right", bbox_to_anchor=(1.1, 1))
 
-        # Show the plot
         plt.show()
 
     def plot_cocktails_preparation_methods(self):
-        # Cocktails methods of preparation
+        """
+        Plots a pie chart showing the distribution of different preparation methods used for cocktails.
+        """
+
         prep_methods = self.cocktails['prep_method'].value_counts()
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(12, 6))
 
-        # Pie Chart
         wedges, texts, autotexts = plt.pie(prep_methods, labels=prep_methods.index, autopct='%1.1f%%', startangle=200,
                                            colors=sns.color_palette('coolwarm', len(prep_methods)))
 
-        # Add labels and title
         plt.title('Cocktails methods of preparation')
 
-        # Create custom labels for the legend that include category and number of cocktails
         legend_labels = [f'{count} cocktails' for count in prep_methods]
 
-        # Add the legend
         plt.legend(wedges, legend_labels, title="Number of Cocktails", loc="upper right", bbox_to_anchor=(1.1, 1))
 
-        # Show the plot
         plt.show()
 
     def plot_cocktail_glasses(self):
-        # Cocktails Glasses
+        """
+        Plots a horizontal bar chart showing the percentage of cocktails served in different types of glasses.
+        """
+
         top_categories = self.cocktails['glass'].value_counts()
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(12, 6))
         ax = sns.barplot(x=top_categories.values / len(self.cocktails) * 100, y=top_categories.index,
                          palette='coolwarm',
                          hue=top_categories.index)
 
-        # Add labels and title
         plt.xlabel('Cocktails(%)')
         plt.ylabel('Glass')
         plt.title('Cocktails Glasses')
@@ -74,54 +72,59 @@ class Plotter:
         for container in ax.containers:
             ax.bar_label(container, fmt='%.2f%%')
 
-        # Show the plot
         plt.show()
 
     def plot_cocktail_instruction_lengths(self, n_cocktails):
-        # Top N hardest to prepare cocktails
+        """
+         Plots a bar chart showing the top N cocktails with the longest instruction lengths.
+
+         :param n_cocktails: Number of cocktails to include in the plot.
+         """
+
         hardest_cocktails = self.cocktails.sort_values(ascending=False, by='instruction_length').head(n_cocktails)
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(10, 6))
         sns.barplot(x=hardest_cocktails['instruction_length'], y=hardest_cocktails['name'], palette='coolwarm',
                     hue=hardest_cocktails['name'])
 
-        # Add labels and title
         plt.ylabel('Cocktails')
         plt.xlabel('Instruction length')
         plt.title(f'Top {n_cocktails} Cocktails by instruction length')
 
-        # Show the plot
         plt.show()
 
     def plot_cocktails_with_largest_amount_of_ingredients(self, n_cocktails):
-        # Top N cocktails with largest amount of ingredients
+        """
+         Plots a bar chart showing the top N cocktails with the largest number of ingredients.
+
+         :param n_cocktails: Number of cocktails to include in the plot.
+         """
         top_n = 30
         hardest_cocktails = self.cocktails.sort_values(ascending=False, by='num_ingredients').head(top_n)
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(10, 6))
         sns.barplot(x=hardest_cocktails['num_ingredients'], y=hardest_cocktails['name'], palette='coolwarm',
                     hue=hardest_cocktails['name'])
 
-        # Add labels and title
         plt.ylabel('Cocktails')
         plt.xlabel('Num of ingredients')
         plt.title(f'Top {top_n} cocktails by ingredients number')
 
-        # Show the plot
         plt.show()
 
     def plot_cocktails_rank_by_abv(self, n_cocktails, strongest=True):
-        # Cocktails ABV rank
+        """
+        Plots a bar chart showing the top N cocktails by ABV, either strongest or weakest.
+
+        :param n_cocktails: Number of cocktails to include in the plot.
+        :param strongest: If True, plots the strongest cocktails; if False, plots the weakest.
+        """
         cocktails = self.cocktails.sort_values(ascending=not strongest, by='abv').head(n_cocktails)
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(10, 6))
         sns.barplot(x=cocktails['abv'], y=cocktails['name'], palette='coolwarm',
                     hue=cocktails['name'])
 
-        # Add labels and title
         plt.ylabel('Cocktails')
         plt.xlabel('ABV(%)')
         if strongest:
@@ -129,76 +132,78 @@ class Plotter:
         else:
             plt.title(f'Top {n_cocktails} Weakest Cocktails')
 
-        # Show the plot
         plt.show()
 
     def plot_cocktails_strength_distribution(self):
-        # Cocktails strength distribution
-        # Get the strengths distribution
+        """
+         Plots a bar chart and a pie chart showing the distribution of cocktails by strength category.
+         """
+
         strengths = self.cocktails['strength'].value_counts()
 
-        # Create a figure with two subplots
-        fig, axs = plt.subplots(1, 2, figsize=(14, 6))  # 1 row, 2 columns
+        fig, axs = plt.subplots(1, 2, figsize=(14, 6))
 
-        # Bar Plot
         sns.barplot(y=strengths.values, x=strengths.index, hue=strengths.values, ax=axs[0], legend=False)
         axs[0].set_ylabel('Number of Cocktails')
         axs[0].set_xlabel('Strength')
         axs[0].set_title('Cocktails Strength Distribution')
 
-        # Add value labels on top of each bar
         for i, v in enumerate(strengths.values):
             axs[0].text(i, v, str(v), ha='center', va='bottom')
 
         strengths = self.cocktails.query('strength != "Unknown"')['strength'].value_counts()
 
-        # Pie Chart
         wedges, texts, autotexts = axs[1].pie(strengths, labels=strengths.index, autopct='%1.1f%%', startangle=195,
                                               colors=sns.color_palette('coolwarm', len(strengths)))
 
         axs[1].legend(wedges, ['>30%', '20-30%', '10-20%', '<10%'], title="ABV for strength categories", loc="best")
 
-        axs[1].axis('equal')  # Equal aspect ratio ensures that pie chart is circular
+        axs[1].axis('equal')
         axs[1].set_title('Cocktails Strength Distribution (Without Unknowns)')
 
-        # Show the plots
-        plt.tight_layout()  # Adjusts the layout to prevent overlap
+        plt.tight_layout()
         plt.show()
 
     # Ingredients
     def plot_ingredient_types_distribution(self):
-        # Ingredient types distribution
+        """
+        Plots a pie chart showing the distribution of different types of ingredients.
+        """
+
         ingredient_counts = self.ingredients['generalized_type'].value_counts()
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(10, 6))
         plt.pie(ingredient_counts, labels=ingredient_counts.index, autopct='%1.1f%%', startangle=180,
                 colors=sns.color_palette('coolwarm', len(ingredient_counts)))
 
-        # Add labels and title
         plt.title('Ingredient types distribution')
         plt.show()
 
     def plot_most_common_ingredients(self, n_ingredients):
-        # Top N most common ingredients in cocktails
+        """
+         Plots a bar chart showing the top N most common ingredients used in cocktails.
+
+         :param n_ingredients: Number of ingredients to include in the plot.
+         """
+
         ingredient_counts = self.cocktails_and_ingredients['ingredient_name'].value_counts()
 
         top_ingredients = ingredient_counts.head(n_ingredients)
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(10, 6))
         sns.barplot(x=top_ingredients.values / len(self.cocktails) * 100, y=top_ingredients.index, palette='coolwarm',
                     hue=top_ingredients.index)
 
-        # Add labels and title
         plt.xlabel('Cocktails(%)')
         plt.ylabel('Ingredient')
         plt.title(f'Top {n_ingredients} Most Common Ingredients')
 
-        # Show the plot
         plt.show()
 
     def plot_ingredients_co_occurrences(self):
+        """
+        Plots bar charts showing the most common co-occurring ingredients for different ingredient types.
+        """
         # Which ingredients tend to appear together in the same cocktails (Ingredient type and ingredients)
         result_df = self.cocktails_and_ingredients.set_index('ingredient_id').join(
             self.ingredients[['generalized_type', 'name', 'type']], how='left')
@@ -225,6 +230,12 @@ class Plotter:
         plt.show()
 
     def plot_ingredients_by_mean_used_volume(self, n_ingredients, alcoholic=False):
+        """
+        Plots a bar chart of the top N ingredients by mean used volume, optionally filtered by alcoholic ingredients.
+
+        :param n_ingredients: Number of ingredients to include in the plot.
+        :param alcoholic: If True, only includes alcoholic ingredients; otherwise includes all ingredients.
+        """
         if alcoholic:
             merged_df = pd.merge(self.ingredients, self.cocktails_and_ingredients, left_on='id',
                                  right_on='ingredient_id',
@@ -239,11 +250,9 @@ class Plotter:
 
         top_ingredients = ingredients_and_volumes.head(n_ingredients)
 
-        # Create a bar plot using seaborn
         plt.figure(figsize=(10, 6))
         sns.barplot(x=top_ingredients.values, y=top_ingredients.index, palette='coolwarm', hue=top_ingredients.index)
 
-        # Add labels and title
         plt.xlabel('Volume Oz')
         plt.ylabel('Ingredient')
         if alcoholic:
@@ -251,11 +260,13 @@ class Plotter:
         else:
             plt.title(f'Top {n_ingredients} Ingredients by Mean Used Volume')
 
-        # Show the plot
         plt.show()
 
     # Cocktails and ingredients
     def plot_ingredients_frequency_in_every_glass(self):
+        """
+         Plots a heatmap showing the frequency of each ingredient type in different types of glasses.
+         """
         # Which glass types are used with ingredients types
 
         # Function to get ingredients for a given cocktail name
@@ -277,40 +288,34 @@ class Plotter:
 
             return ingrs
 
-        # Initialize a list to hold ingredient and glass type pairs
         ingredients_list = []
 
-        # Collect ingredients for each cocktail along with their glass types
         for index, row in self.cocktails.iterrows():
             cocktail_name = row['name']
             glass_type = row['glass']
 
-            # Get ingredients for the cocktail
             ingrs = get_ingredients(cocktail_name)
 
-            # Create a list of (ingredient, glass type) pairs
             for ingredient in ingrs:
                 ingredients_list.append({'ingredient': ingredient, 'glass': glass_type})
 
-        # Create a DataFrame from the ingredients list
         df = pd.DataFrame(ingredients_list)
 
-        # Count occurrences of each ingredient for each glass type
         pivot_table = df.pivot_table(index='ingredient', columns='glass', aggfunc='size', fill_value=0)
 
-        # Create the heatmap
         plt.figure(figsize=(12, 8))
         sns.heatmap(pivot_table, annot=True, cmap='Blues', fmt='g')
 
-        # Add titles and labels
         plt.title('Number of Times Each Ingredient Type Appears in every Glass')
         plt.xlabel('Glass Type')
         plt.ylabel('Ingredient')
 
-        # Show the chart
         plt.show()
 
     def most_common_ingredients_by_tags(self):
+        """
+         Plots bar charts for the most common ingredients in different cocktail categories (IBA, ContemporaryClassic, Classic).
+         """
         # Most used ingredients for IBA, ConremporaryClassic and Classic cocktails
         cocktails_and_tags = self.cocktails.explode('tags')
         result_df = self.cocktails_and_ingredients.set_index('cocktail_name').join(
@@ -345,13 +350,14 @@ class Plotter:
         axes[2].set_ylabel('Count')
         axes[2].tick_params(axis='x', rotation=45)
 
-        # Adjust layout to prevent overlap
         plt.tight_layout()
 
-        # Show the plots
         plt.show()
 
     def plot_abv_disribution_by_num_of_ingredients(self):
+        """
+        Plots a boxplot showing the distribution of cocktail ABV by the number of ingredients.
+        """
         # ABV of cocktails distribution by number of ingredients
         plt.figure(figsize=(8, 4))
         sns.boxplot(data=self.cocktails, x='num_ingredients', y='abv')
